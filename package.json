@@ -1,0 +1,21 @@
+{
+  "name": "m4l-achord",
+  "version": "1.0.0",
+  "description": "Live chord detection using Node for Max",
+  "main": "n4m.achord.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha"
+  },
+  "author": "Max Kraan",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^7.0.0"
+  },
+  "dependencies": {
+    "fft-js": "0.0.12",
+    "mathjs": "^6.5.0"
+  }
+}
