@@ -1,4 +1,6 @@
-import { handleData, trimBuffer, detectChord } from "./modules/main";
+const handleData = require('./modules/main').handleData;
+const trimBuffer = require('./modules/main').trimBuffer;
+const detectChord = require('./modules/main').detectChord;
 
 var sampleRate = 44100;
 var sampleLength = 4096;
@@ -43,7 +45,7 @@ which is stored and maintained in memory by trimBuffer.
 PCPDict allows Max to access the average PCP profile for visualization purposes.
 */
 buffer = new Buffer('coreSignalBuffer');
-var meanChromagram = new Dict('meanChromagram')
+var displayChromagram = new Dict('displayChromagram')
 
 async function processBufferFrame(start_frame, end_frame) {
     audioFrame = buffer.peek(start_frame, end_frame);

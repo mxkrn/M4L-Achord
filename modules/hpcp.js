@@ -1,5 +1,6 @@
-const fft = require('fft-js').fft;
-const fftUtil = require('fft-js').util;
+const fft = require('./fft').fft;
+const fftMag = require('./fft').fftMag;
+const fftFreq = require('./fft').fftFreq;
 
 // at the moment we only consider a static tuning frequency: A4=440Hz
 const fref = 440;
@@ -7,7 +8,6 @@ const fmin = 55; // corresponding to A7
 const fmax = 3520; // corresponding to A1
 
 // generate this ahead of time to save compute
-const octaves = Array.from({length: 7}, (v, k) => -3 + k);
 const temperedScale = generateEqualTemperedScale();
 const length = 0.5*(4/3);
 
@@ -74,8 +74,8 @@ async function windowedDFT(signal, samplerate) {
     });
     windowed = await Promise.all(promises);
     const phasors = fft(windowed);
-	const freqs = fftUtil.fftFreq(phasors, samplerate);
-    const magnitudes = fftUtil.fftMag(phasors);
+	const freqs = fftFreq(phasors, samplerate);
+    const magnitudes = fftMag(phasors);
     return {'freqs': freqs, 'y': magnitudes};
 }
 exports.windowedDFT = windowedDFT;
