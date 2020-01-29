@@ -1,4 +1,4 @@
-const harmonicPCP = require('./hpcp.js').harmonicPCP;
+const harmonicPCP = require('./hpcp').harmonicPCP;
 
 let sampleRate = 44100;
 let hopLength = 1024;
@@ -24,7 +24,7 @@ async function handleData(audio, buffer, event) {
 		}
 	} else {
 		// On data, process the audio and append to chromaBuffer
-		hpcp = await harmonicPCP(audio, sampleRate);
+		const hpcp = await harmonicPCP(audio, sampleRate);
 		buffer.push(hpcp);
 		event = 0 // Reset event tracker because we received new data
 	};
@@ -81,20 +81,20 @@ async function detectChord(buffer) {
 	let chord = 'N';
 	if (buffer.length > 0) {
 		// average all chroma in chromaBuffer
-		chromagram = buffer.reduce(sumVertical).map(i => {
+		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
 		});
 
 		// iterate over model async and update distance if less than previous
-		promises = Object.entries(model).map(async(obj) => {
+		let promises = Object.entries(model).map(async(obj) => {
 			const key = obj[0];
 			const target = obj[1];
 
-			distance = await dotProduct(chromagram, target);
+			let distance = await dotProduct(chromagram, target);
 			return {'chord': key, 
 					'score': distance}
 		 });
-		scores = await Promise.all(promises)
+		let scores = await Promise.all(promises)
 
 		// Get minimum distance and key
 		let max_score = 0;
@@ -112,10 +112,10 @@ async function detectChord(buffer) {
 exports.detectChord = detectChord;
 
 async function dotProduct(data, target) {
-    promises = data.map(async(bin, i) => {
+    let promises = data.map(async(bin, i) => {
         return await bin*target[i];
     });
-	scores = await Promise.all(promises);
+	let scores = await Promise.all(promises);
 	return scores.reduce((a, b) => a + b, 0)
 }
 exports.dotProduct = dotProduct;

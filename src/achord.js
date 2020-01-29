@@ -62,4 +62,4 @@ Periodic task to detect chord if data is present in buffer
 setInterval(async function() {
     chord = await detectChord(chromaBuffer);
     outlet(chord);
-}, 100);
+}, 200);
