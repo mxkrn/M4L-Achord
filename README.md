@@ -2,4 +2,6 @@
 
 This application is currently in development mode.
 
-To run tests: `npm install && node_modules/.bin/mocha`
+To transpile to ES5: `npm run build`
+
+To run tests: `npm run test`
