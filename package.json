@@ -12,10 +12,9 @@
   "author": "Max Kraan",
   "license": "ISC",
   "devDependencies": {
+    "fft-js": "0.0.12",
+    "mathjs": "^6.5.0",
     "mocha": "^7.0.0"
   },
-  "dependencies": {
-    "fft-js": "0.0.12",
-    "mathjs": "^6.5.0"
-  }
+  "dependencies": {}
 }
