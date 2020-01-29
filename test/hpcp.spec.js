@@ -1,5 +1,6 @@
 const { performance } = require('perf_hooks');
 const assert = require('assert');
+import { ComplexArray } from 'fft';
 
 const generateEqualTemperedScale = require("../modules/hpcp").generateEqualTemperedScale;
 const windowedDFT = require("../modules/hpcp").windowedDFT;
@@ -47,6 +48,17 @@ describe('windowedDFT', function() {
     assert.ok(delta < 20);
   });
 });
+
+// check again FFT implementation
+describe('FFT', function() {
+  it('should work', function() {
+    // Use the in-place mapper to populate the data.
+    const data = new fft.ComplexArray(512).map((value, i, n) => {
+      value.real = (i > n/3 && i < 2*n/3) ? 1 : 0;
+    });
+    console.log(data);
+  })
+})
 
 // getParabolaPeak
 describe('getParabolaPeak', function() {

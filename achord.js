@@ -1,54 +1,63 @@
-const Max = require("max-api");
+import { handleData, trimBuffer, detectChord } from "./modules/main";
 
-/* 
----------------------------------------------------------
-This is the entrypoint for the Node script containing the application's
-core logic.
----------------------------------------------------------
+var sampleRate = 44100;
+var sampleLength = 4096;
+var hopLength = 1024;
+var bufferLength = sampleRate*1;
+
+var eventTracker = 0;
+var chromaBuffer = [];
+
+post('Initialized sample rate to', sampleRate, 'samples');
+post('Initialized sample length to', sampleLenth, 'samples');
+post('Initialized hop length to', hopLength, 'samples');
+post('Initialized buffer length to', bufferLength, 'samples');
+
+function setSampleRate(value) {
+    sampleRate = value;
+    post('Set sample rate to', sampleRate);
+}
+
+function setSampleLength(value) {
+    sampleLength = value;
+    post('Set sample length to', sampleLength);
+}
+
+function setHopLength(value) {
+    hopLength = value;
+    post('Set hop length to', hopLength);
+}
+
+function setModelType(value) {
+    model = template[value];
+    post('Now using the', value, 'model type');
+}
+
+/*
+The audio processing step is the most CPU intensive step of the process.
+In essence, we are using STFT on slices of a signal buffer. The frames and timing
+are handled by Max. This handler simply processes the data found in the buffer
+from start_frame to end_frame and appends the resulting chroma to the chromaBuffer list
+which is stored and maintained in memory by trimBuffer. 
+
+PCPDict allows Max to access the average PCP profile for visualization purposes.
 */
-let sampleRate = 44100;
-let sampleLength = 4096;
-let hopLength = 1024;
-let bufferLength = sampleRate*1; // currently hard-coded to one second
-let eventTracker = 0; // we use this to check if we haven't received new data 
-let chromaBuffer = []; // stores the processed chroma arrays
+buffer = new Buffer('coreSignalBuffer');
+var meanChromagram = new Dict('meanChromagram')
 
-// Max handlers and interval functions
-// *disable these to run tests*
-Max.post(`Initialized sample rate to ${sampleRate} samples.`);
-Max.post(`Initialized sample length to ${sampleLength} samples.`);
-Max.post(`Initialized hop length to ${hopLength} samples.`);
-Max.post(`Initialized buffer length to ${bufferLength} samples.`)
+async function processBufferFrame(start_frame, end_frame) {
+    audioFrame = buffer.peek(start_frame, end_frame);
+    [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
+}
 
-Max.addHandler('setSampleRate', (value) => {
-	sampleRate = value;
-	Max.post(`Set sample rate to ${sampleRate}`);
-})
-Max.addHandler('setSampleLength', (value) => {
-	sampleLength = value;
-	Max.post(`Set sample length to ${sampleLength}`);
-})
-Max.addHandler('setHopLength', (value) => {
-	hopLength = value;
-	Max.post(`Set hop length to ${hopLength}`);
-})
-Max.addHandler('model-type', (value) => {
-	model = templates[value];
-	console.log('Now using the ', value, ' model type.');
-})
-
-// Processes and appends chroma to buffer
-Max.addHandler('audio', async(audio) => {
-	[chromaBuffer, eventTracker] = await handleAudio(audio, chromaBuffer, eventTracker);
-});
-
-// Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
-	chromaBuffer = trimBuffer(chromaBuffer);
+    chromaBuffer = trimBuffer(chromaBuffer);
 }, 200);
 
-// Periodic task to detect chord if data present in buffer
+/*
+Periodic task to detect chord if data is present in buffer
+*/
 setInterval(async function() {
-	chord = await detectChord(chromaBuffer);
-	Max.outlet(chord);
+    chord = await detectChord(chromaBuffer);
+    outlet(chord);
 }, 100);
