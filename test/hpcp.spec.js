@@ -1,12 +1,12 @@
 const { performance } = require('perf_hooks');
 const assert = require('assert');
 
-const generateEqualTemperedScale = require("../modules/hpcp").generateEqualTemperedScale;
-const windowedDFT = require("../modules/hpcp").windowedDFT;
-const getParabolaPeak = require("../modules/hpcp").getParabolaPeak;
-const parabolaPeakInterpolation = require("../modules/hpcp").parabolaPeakInterpolation;
-const peakDetection = require("../modules/hpcp").peakDetection;
-const harmonicPCP = require("../modules/hpcp").harmonicPCP;
+const generateEqualTemperedScale = require("../build/modules/hpcp").generateEqualTemperedScale;
+const windowedDFT = require("../build/modules/hpcp").windowedDFT;
+const getParabolaPeak = require("../build/modules/hpcp").getParabolaPeak;
+const parabolaPeakInterpolation = require("../build/modules/hpcp").parabolaPeakInterpolation;
+const peakDetection = require("../build/modules/hpcp").peakDetection;
+const harmonicPCP = require("../build/modules/hpcp").harmonicPCP;
 
 // UNIT TESTS
 
@@ -30,8 +30,6 @@ let sampleLength = 4096;
 let sampleRate = 44100;
 let signal = Array.from({length: sampleLength}, (v, k) => getRandomInt(256));
 
-
-
 // windowedDFT
 describe('windowedDFT', function() {
   it('should window the signal and then compute the FFT', async function () {
@@ -44,7 +42,7 @@ describe('windowedDFT', function() {
     spectogram = await windowedDFT(signal, sampleRate);
     t1 = performance.now();
     delta = t1 - t0;
-    assert.ok(delta < 20);
+    assert.ok(delta < 50);
   });
 });
 
