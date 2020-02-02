@@ -52,9 +52,11 @@ var buffer_index = 0;
 async function processBufferFrame(end_frame) {
 	var audioFrame = bufferArray[buffer_index % 4].peek(1, end_frame, end_frame);
 	buffer_index++;
-	if (buffer_index >= 4) {buffer_index = 0;};
-    [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
-    post('Handled audio');
+	if (buffer_index >= 4) {
+    buffer_index = 0;
+  };
+  [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
+  post('Handled audio');
 }
 
 function trimChromaBuffer() {
