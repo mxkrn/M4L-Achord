@@ -47,24 +47,24 @@ bufferArray[1] = new Buffer("audioBuffer1");
 bufferArray[2] = new Buffer("audioBuffer2");
 bufferArray[3] = new Buffer("audioBuffer3");
 // var displayChromagram = new Dict('displayChromagram')
+var buffer_index = 0;
 
-
-async function processBuffer(end_frame) {
-	var audioFrame = bufferArray[i % 4].peek(1, end_frame, end_frame);
-	i++;
-	if (i >= 4) {i = 0;};
+async function processBufferFrame(end_frame) {
+	var audioFrame = bufferArray[buffer_index % 4].peek(1, end_frame, end_frame);
+	buffer_index++;
+	if (buffer_index >= 4) {buffer_index = 0;};
     [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
-    post('Handled audio successfully');
+    post('Handled audio');
 }
 
-function trim() {
+function trimChromaBuffer() {
 	chromaBuffer = trimBuffer(chromaBuffer);
 	post('Trimmed buffer');
 }
 
-async function detect() {
+async function detectChordProfile() {
   post('Detecting chord');
 	chord = await detectChord(chromaBuffer);
   outlet(1, chord);
-  post('A', chord, 'was detected');
+  post(chord, 'was detected');
 }
