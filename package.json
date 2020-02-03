@@ -1,27 +1,33 @@
 {
   "name": "m4l-achord",
   "version": "1.0.0",
-  "description": "Live chord detection using Node for Max",
-  "main": "n4m.achord.js",
+  "description": "Live chord detection in using JavaScript in  Max 8",
+  "main": "achord.max.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
-    "build": "babel src -d build"
+    "build": "node_modules/.bin/max-js-bundler build achord.js >> achord.max-bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mxkrn/M4L-Achord.git"
   },
   "author": "Max Kraan",
   "license": "ISC",
-  "devDependencies": {
-    "@babel/cli": "^7.8.3",
-    "@babel/core": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "fft-js": "0.0.12",
-    "mathjs": "^6.5.0",
-    "mocha": "^7.0.0"
+  "bugs": {
+    "url": "https://github.com/mxkrn/M4L-Achord/issues"
   },
-  "dependencies": {
-    "@babel/runtime": "^7.8.3"
+  "homepage": "https://github.com/mxkrn/M4L-Achord#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "fft-js": "0.0.12",
+    "mathjs": "^6.6.0",
+    "max-js-bundler": "^1.2.0",
+    "mocha": "^7.0.1"
   }
 }

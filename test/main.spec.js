@@ -2,11 +2,11 @@ const { performance } = require('perf_hooks');
 const assert = require('assert');
 const math = require('mathjs')
 
-const sumVertical = require('../build/modules/main').sumVertical;
-const dotProduct = require('../build/modules/main').dotProduct;
-const detectChord = require('../build/modules/main').detectChord;
-const trimBuffer = require('../build/modules/main').trimBuffer;
-const handleData = require('../build/modules/main').handleData;
+const sumVertical = require('../src/main').sumVertical;
+const dotProduct = require('../src/main').dotProduct;
+const detectChord = require('../src/main').detectChord;
+const trimBuffer = require('../src/main').trimBuffer;
+const handleData = require('../src/main').handleData;
 
 
 testArray = [[2,3,1],[6,1,5]];
