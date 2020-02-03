@@ -15,6 +15,7 @@ TODO: Move feature extraction into worker thread using an audioBuffer
 
 async function handleData(audio, buffer, event) {
 	if (audio.length === 0) {
+		post('Audio snippet passed has length zero');
 		event += 1
 		if (event >= Math.floor(sampleRate/hopLength)*2 & buffer.length > 0) {
 			// After 2 seconds of no data, the chromaBuffer times out and resets
@@ -24,6 +25,7 @@ async function handleData(audio, buffer, event) {
 	} else {
 		// On data, process the audio and append to chromaBuffer
 		const hpcp = await harmonicPCP(audio, sampleRate);
+		post('Computed HPCP');
 		buffer.push(hpcp);
 		event = 0 // Reset event tracker because we received new data
 	};
@@ -35,6 +37,7 @@ function trimBuffer(buffer) {
 	if (buffer.length > Math.floor(bufferLength / hopLength)) {
 		buffer.reverse().splice(bufferLength / hopLength);
 		buffer.reverse();
+		post('Trimmed buffer');
 	};
 	return buffer;
 }
@@ -83,6 +86,7 @@ async function detectChord(buffer) {
 		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
 		});
+		post('Average chromagram', chromagram);
 
 		// iterate over model async and update distance if less than previous
 		let promises = Object.entries(model).map(async(obj) => {
@@ -94,6 +98,7 @@ async function detectChord(buffer) {
 					'score': distance}
 		 });
 		let scores = await Promise.all(promises)
+		post('Scores:', scores);
 
 		// Get minimum distance and key
 		let max_score = 0;
