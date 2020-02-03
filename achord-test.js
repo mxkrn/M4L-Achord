@@ -1,34 +1,36 @@
-outlets = 2;
+Max = require('max-api');
+
 var handleData = require('./src/main').handleData;
 var detectChord = require('./src/main').detectChord;
-var trimBuffer = require('./src/main').trimBuffer;
+var trimBuffer = require('./src/main').trimChromaBuffer;
 
-var sampleRate = 44100;
-var sampleLength = 4096;
-var hopLength = 1024;
-var bufferLength = sampleRate * 1;
-var eventTracker = 0;
-var chromaBuffer = [];
+const sampleRate = 22050;
+const sampleLength = 4096;
+const hopLength = 2048;
+const bufferLength = sampleRate * 1;
+const eventTracker = 0;
+const chromaBuffer = [];
+const audioBuffer = new Array;
 
-post('Initialized sample rate to', sampleRate, 'samples');
-post('Initialized sample length to', sampleLength, 'samples');
-post('Initialized hop length to', hopLength, 'samples');
-post('Initialized buffer length to', bufferLength, 'samples');
-post('Initialized model type to basic');
+Max.post('Initialized sample rate to', sampleRate, 'samples');
+Max.post('Initialized sample length to', sampleLength, 'samples');
+Max.post('Initialized hop length to', hopLength, 'samples');
+Max.post('Initialized buffer length to', bufferLength, 'samples');
+Max.post('Initialized model type to basic');
 
 function setSampleRate(value) {
   sampleRate = value;
-  post('Set sample rate to', sampleRate);
+  Max.post('Set sample rate to', sampleRate);
 }
 
 function setSampleLength(value) {
   sampleLength = value;
-  post('Set sample length to', sampleLength);
+  Max.post('Set sample length to', sampleLength);
 }
 
 function setHopLength(value) {
   hopLength = value;
-  post('Set hop length to', hopLength);
+  Max.post('Set hop length to', hopLength);
 }
 
 
@@ -41,33 +43,21 @@ which is stored and maintained in memory by trimBuffer.
 
 PCPDict allows Max to access the average PCP profile for visualization purposes.
 */
-var bufferArray = new Array();
-bufferArray[0] = new Buffer("audioBuffer0");
-bufferArray[1] = new Buffer("audioBuffer1");
-bufferArray[2] = new Buffer("audioBuffer2");
-bufferArray[3] = new Buffer("audioBuffer3");
-// var displayChromagram = new Dict('displayChromagram')
-var buffer_index = 0;
 
-function processBufferFrame(end_frame) {
-  var audioFrame = bufferArray[buffer_index % 4].peek(1, end_frame, end_frame);
-  post('Got audio frame of length', audioFrame.length);
-  // [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
-  post('Handled audio');
-  buffer_index++;
-	if (buffer_index >= 4) {
-    buffer_index = 0;
-  };
-}
+Max.addHandler('processAudio', function(value) {
+	audioBuffer.push(value);	
+});
+
+setInterval(function())
 
 function trimChromaBuffer() {
-	// chromaBuffer = trimBuffer(chromaBuffer);
+	chromaBuffer = trimBuffer(chromaBuffer);
 	post('Trimmed buffer');
 }
 
-function detectChordProfile() {
-  post('Detecting chord');
-  // chord = await detectChord(chromaBuffer);
-  outlet(1, 'X');
-  post('X', 'was detected');
-}
+// function detectChordProfile() {
+//   post('Detecting chord');
+//   // chord = await detectChord(chromaBuffer);
+//   outlet(1, 'X');
+//   post('X', 'was detected');
+// }

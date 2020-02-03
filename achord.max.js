@@ -1,17 +1,23 @@
 const Max = require("max-api");
 
+var processAudio = require('./src/main').processAudio;
+var detectChord = require('./src/main').detectChord;
+var trimChromaBuffer = require('./src/main').trimChromaBuffer;
+var trimAudioBuffer = require('./src/main').trimAudioBuffer;
+
 /* 
 ---------------------------------------------------------
 This is the entrypoint for the Node script containing the application's
 core logic.
 ---------------------------------------------------------
 */
-let sampleRate = 44100;
+let sampleRate = 22050;
 let sampleLength = 4096;
-let hopLength = 1024;
+let hopLength = sampleLength/2;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
 let eventTracker = 0; // we use this to check if we haven't received new data 
-let chromaBuffer = []; // stores the processed chroma arrays
+let chromaBuffer = new Array; // stores the processed chroma arrays
+let audioBuffer = new Array;
 
 // Max handlers and interval functions
 // *disable these to run tests*
@@ -37,18 +43,28 @@ Max.addHandler('model-type', (value) => {
 	console.log('Now using the ', value, ' model type.');
 })
 
-// Processes and appends chroma to buffer
-Max.addHandler('audio', async(audio) => {
-	[chromaBuffer, eventTracker] = await handleAudio(audio, chromaBuffer, eventTracker);
+Max.addHandler('processAudio', function(value) {
+	audioBuffer.push(value);	
 });
+
+// Processes and appends chroma to buffer
+setInterval(async function() {
+	if (audioBuffer.length >= sampleLength) {
+		for (let i=0; i < Math.floor(audioBuffer.length / hopLength) - 1; i++) {
+			audio = audioBuffer.slice(i*hopLength, (i*hopLength)+sampleLength);
+			[chromaBuffer, eventTracker] = await processAudio(audio, chromaBuffer, eventTracker);
+		};
+	};
+})
 
 // Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
-	chromaBuffer = trimBuffer(chromaBuffer);
+	audioBuffer = trimAudioBuffer(audioBuffer);
+	chromaBuffer = trimChromaBuffer(chromaBuffer);
 }, 200);
 
 // Periodic task to detect chord if data present in buffer
 setInterval(async function() {
 	chord = await detectChord(chromaBuffer);
 	Max.outlet(chord);
-}, 100);
+})
