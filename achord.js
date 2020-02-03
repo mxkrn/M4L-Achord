@@ -1,7 +1,7 @@
 outlets = 2;
-var handleData = require('./main').handleData;
-var detectChord = require('./main').detectChord;
-var trimBuffer = require('./main').trimBuffer;
+var handleData = require('./src/main').handleData;
+var detectChord = require('./src/main').detectChord;
+var trimBuffer = require('./src/main').trimBuffer;
 
 var sampleRate = 44100;
 var sampleLength = 4096;
