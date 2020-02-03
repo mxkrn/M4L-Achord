@@ -65,5 +65,6 @@ function trim() {
 async function detect() {
   post('Detecting chord');
 	chord = await detectChord(chromaBuffer);
-	outlet(1, chord);
+  outlet(1, chord);
+  post('A', chord, 'was detected');
 }
