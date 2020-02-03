@@ -49,7 +49,7 @@ bufferArray[3] = new Buffer("audioBuffer3");
 // var displayChromagram = new Dict('displayChromagram')
 
 
-async function process(end_frame) {
+async function processBuffer(end_frame) {
 	var audioFrame = bufferArray[i % 4].peek(1, end_frame, end_frame);
 	i++;
 	if (i >= 4) {i = 0;};
