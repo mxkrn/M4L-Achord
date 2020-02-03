@@ -54,14 +54,16 @@ async function processBuffer(end_frame) {
 	i++;
 	if (i >= 4) {i = 0;};
     [chromaBuffer, eventTracker] = await handleData(audioFrame, chromaBuffer, eventTracker);
+    post('Handled audio successfully');
 }
 
 function trim() {
 	chromaBuffer = trimBuffer(chromaBuffer);
-	post('Trimming buffer');
+	post('Trimmed buffer');
 }
 
 async function detect() {
+  post('Detecting chord');
 	chord = await detectChord(chromaBuffer);
 	outlet(1, chord);
 }
