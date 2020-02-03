@@ -65,9 +65,9 @@ Chord Detection
 ---------------------------------------------------------
 detectChord: interval function to detect chord in chromaBuffer using binary template method
 */
-const _basic = require('../templates/basic.json');
-const _extended = require('../templates/extended.json');
-const _full = require('../templates/full.json');
+const _basic = require('../../templates/basic.json');
+const _extended = require('../../templates/extended.json');
+const _full = require('../../templates/full.json');
 
 const templates = {
 	'basic': _basic,
