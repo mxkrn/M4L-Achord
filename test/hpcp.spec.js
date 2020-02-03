@@ -1,12 +1,12 @@
 const { performance } = require('perf_hooks');
 const assert = require('assert');
 
-const generateEqualTemperedScale = require("../build/modules/hpcp").generateEqualTemperedScale;
-const windowedDFT = require("../build/modules/hpcp").windowedDFT;
-const getParabolaPeak = require("../build/modules/hpcp").getParabolaPeak;
-const parabolaPeakInterpolation = require("../build/modules/hpcp").parabolaPeakInterpolation;
-const peakDetection = require("../build/modules/hpcp").peakDetection;
-const harmonicPCP = require("../build/modules/hpcp").harmonicPCP;
+const generateEqualTemperedScale = require("../src/hpcp").generateEqualTemperedScale;
+const windowedDFT = require("../src/hpcp").windowedDFT;
+const getParabolaPeak = require("../src/hpcp").getParabolaPeak;
+const parabolaPeakInterpolation = require("../src/hpcp").parabolaPeakInterpolation;
+const peakDetection = require("../src/hpcp").peakDetection;
+const harmonicPCP = require("../src/hpcp").harmonicPCP;
 
 // UNIT TESTS
 

@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const fft = require('../build/modules/fft').fft;
+const fft = require('../src/fft').fft;
 
 const _fft = require('fft-js').fft;
 
