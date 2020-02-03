@@ -1,5 +1,4 @@
 const harmonicPCP = require('./hpcp').harmonicPCP;
-
 let sampleRate = 44100;
 let hopLength = 1024;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
