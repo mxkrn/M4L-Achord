@@ -1,63 +1,78 @@
-Max = require('max-api');
+const Max = require("max-api");
 
-var handleData = require('./src/main').handleData;
+var processAudio = require('./src/main').processAudio;
 var detectChord = require('./src/main').detectChord;
-var trimBuffer = require('./src/main').trimChromaBuffer;
+var trimChromaBuffer = require('./src/main').trimChromaBuffer;
+var trimAudioBuffer = require('./src/main').trimAudioBuffer;
 
-const sampleRate = 22050;
-const sampleLength = 4096;
-const hopLength = 2048;
-const bufferLength = sampleRate * 1;
-const eventTracker = 0;
-const chromaBuffer = [];
-const audioBuffer = new Array;
-
-Max.post('Initialized sample rate to', sampleRate, 'samples');
-Max.post('Initialized sample length to', sampleLength, 'samples');
-Max.post('Initialized hop length to', hopLength, 'samples');
-Max.post('Initialized buffer length to', bufferLength, 'samples');
-Max.post('Initialized model type to basic');
-
-function setSampleRate(value) {
-  sampleRate = value;
-  Max.post('Set sample rate to', sampleRate);
-}
-
-function setSampleLength(value) {
-  sampleLength = value;
-  Max.post('Set sample length to', sampleLength);
-}
-
-function setHopLength(value) {
-  hopLength = value;
-  Max.post('Set hop length to', hopLength);
-}
-
-
-/*
-The audio processing step is the most CPU intensive step of the process.
-In essence, we are using STFT on slices of a signal buffer. The frames and timing
-are handled by Max. This handler simply processes the data found in the buffer
-from start_frame to end_frame and appends the resulting chroma to the chromaBuffer list
-which is stored and maintained in memory by trimBuffer. 
-
-PCPDict allows Max to access the average PCP profile for visualization purposes.
+/* 
+---------------------------------------------------------
+This is the entrypoint for the Node script containing the application's
+core logic.
+---------------------------------------------------------
 */
+let sampleRate = 22050;
+let sampleLength = 4096;
+let hopLength = sampleLength/2;
+let bufferLength = sampleRate*1; // currently hard-coded to one second
+let eventTracker = 0; // we use this to check if we haven't received new data 
+let chromaBuffer = new Array; // stores the processed chroma arrays
+let audioBuffer = new Array;
+
+// Max handlers and interval functions
+// *disable these to run tests*
+Max.post(`Initialized sample rate to ${sampleRate} samples.`);
+Max.post(`Initialized sample length to ${sampleLength} samples.`);
+Max.post(`Initialized hop length to ${hopLength} samples.`);
+Max.post(`Initialized buffer length to ${bufferLength} samples.`)
+
+Max.addHandler('setSampleRate', (value) => {
+	sampleRate = value;
+	Max.post(`Set sample rate to ${sampleRate}`);
+})
+Max.addHandler('setSampleLength', (value) => {
+	sampleLength = value;
+	Max.post(`Set sample length to ${sampleLength}`);
+})
+Max.addHandler('setHopLength', (value) => {
+	hopLength = value;
+	Max.post(`Set hop length to ${hopLength}`);
+})
+Max.addHandler('model-type', (value) => {
+	model = templates[value];
+	console.log('Now using the ', value, ' model type.');
+})
 
 Max.addHandler('processAudio', function(value) {
-	audioBuffer.push(value);	
+    audioBuffer.push(value);
+    // Max.post(audioBuffer.length);
 });
 
-setInterval(function())
+// Processes and appends chroma to buffer
+setInterval(async function() {
+	if (audioBuffer.length >= sampleLength) {
+		for (let i=0; i < Math.floor(audioBuffer.length / hopLength) - 1; i++) {
+			audio = audioBuffer.slice(i*hopLength, (i*hopLength)+sampleLength);
+			// Max.post('Processing audio with length: ', audio.length);
+        };
+    };
+}, 100);
 
-function trimChromaBuffer() {
-	chromaBuffer = trimBuffer(chromaBuffer);
-	post('Trimmed buffer');
-}
+// Periodic task to trim buffer if length is greater than bufferLength
+setInterval(function() {
+	audioBuffer = trimAudioBuffer(audioBuffer);
+	chromaBuffer = trimChromaBuffer(chromaBuffer);
+}, 200);
 
-// function detectChordProfile() {
-//   post('Detecting chord');
-//   // chord = await detectChord(chromaBuffer);
-//   outlet(1, 'X');
-//   post('X', 'was detected');
-// }
+// Periodic task to detect chord if data present in buffer
+setInterval(async function() {
+	chord = 'X';
+	Max.outlet(chord);
+}, 200);
+
+let s = 0
+setInterval(function() {
+    Max.post('Count:', s);
+    Max.post('SR:', audioBuffer.length / s);
+    s++;
+}, 1000)
