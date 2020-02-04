@@ -4,7 +4,7 @@ const math = require('mathjs')
 
 const sumVertical = require('../src/main').sumVertical;
 const detectChord = require('../src/main').detectChord;
-const trimBuffer = require('../src/main').trimBuffer;
+const trimBuffer = require('../src/main').trimChromaBuffer;
 const processAudio = require('../src/main').processAudio;
 
 
