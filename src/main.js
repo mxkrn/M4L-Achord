@@ -1,3 +1,4 @@
+const Max = require('max-api');
 const util = require('util');
 const fsp = require('fs').promises;
 const AudioContext = require('web-audio-api').AudioContext;
@@ -133,15 +134,13 @@ async function readAudioAsync(fpath, buffer) {
 	ctx = new AudioContext();
 	decodeAudioDataAsync = util.promisify(ctx.decodeAudioData);
 	arrayBuffer = await fsp.readFile(fpath);
-	audio = await decodeAudioDataAsync(arrayBuffer)
-		.then((audio) => {
-			return audio._data;
-		})
-		.catch((err) => {
-			// For some reason the err contains the data
-			// An issue has been submitted on web-audio-api
-			return err._data;
-		});
+	audio = await decodeAudioDataAsync(arrayBuffer).then((audio) => {
+		return audio._data;
+	}).catch((err) => {
+		// For some reason the err contains the data
+		// An issue has been submitted on web-audio-api
+		return err._data;
+	});
 	return audio[0];
-	}
+}
 exports.readAudioAsync = readAudioAsync;

@@ -1,6 +1,9 @@
 const Max = require('max-api');
-const fsp = require('fs').promises;
+const fs = require('fs');
+const fsp = fs.promises;
 const chokidar = require('chokidar');
+
+
 
 const processAudio = require('./src/main').processAudio;
 const detectChord = require('./src/main').detectChord;
@@ -18,13 +21,7 @@ let sampleRate = 44100;
 let sampleLength = 4096;
 let hopLength = sampleLength/2;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
-let defaultDirectoryPath = 'tmp';
-
-// Max handlers and interval functions
-Max.post(`Initialized sample rate to ${sampleRate} samples.`);
-Max.post(`Initialized sample length to ${sampleLength} samples.`);
-Max.post(`Initialized hop length to ${hopLength} samples.`);
-Max.post(`Initialized buffer length to ${bufferLength} samples.`)
+let defaultDirectoryPath = '';
 
 Max.addHandler('setSampleRate', (value) => {
 	sampleRate = value;
@@ -38,18 +35,21 @@ Max.addHandler('setHopLength', (value) => {
 	hopLength = value;
 	Max.post(`Set hop length to ${hopLength}`);
 })
-Max.addHandler('modelType', (value) => {
+Max.addHandler('setModelType', (value) => {
 	model = templates[value];
-	console.log('Now using the ', value, ' model type.');
+	Max.post(`Now using the ${value} model type`);
 })
-Max.addHandler('defaultAudioPath', (value) => {
-	defaultDirectoryPath = value;
-	console.log('Default directory path was set to', defaultDirectoryPath);
-})
+Max.addHandler('setDefaultPath', (value) => {
+	if (!fs.existsSync(value + '/tmp/')){
+		fs.mkdirSync(value + '/tmp/');
+	}
+	defaultDirectoryPath = value + '/tmp/';
+	Max.post(`Set default directory path to ${defaultDirectoryPath}`);
+});
 
 // audio processing
 let eventTracker = 0;
-const chromaBuffer = [];
+let chromaBuffer = [];
 let lastCall = Date.now();
 const timeout = 2000; // timeout (in ms) before chromaBuffer is cleared
 let emptyBuffer = true;
@@ -57,18 +57,21 @@ let emptyBuffer = true;
 // This function uses chokidar to watch the default directory where audio is  written to from Max. 
 // When a new file is added:
 // the file is read, the contents pushed into audioBuffer, and the file is deleted
-const watcher = chokidar.watch(defaultDirectoryPath, {
-	ignored: /(^|[\/\\])\../, // ignore dotfiles
-	persistent: true
-  });
-watcher
-	.on('add', async(fpath) => await onNewFile(fpath))
+setTimeout(() => {
+	const watcher = chokidar.watch(defaultDirectoryPath, {
+		ignored: /(^|[\/\\])\../, // ignore dotfiles
+		persistent: true
+	  });
+	watcher
+		.on('add', async(fpath) => await onNewFile(fpath))
+}, 1000)
+
 
 async function onNewFile(fpath) {
 	// Process audio
 	audio = await readAudioAsync(fpath);
 	[chromaBuffer, eventTracker] = await processAudio(audio.slice(0, sampleLength), chromaBuffer, eventTracker);
-
+	Max.post('Appended new chroma', chromaBuffer[0]);
 	// Reset lastCall, emptyBuffer, and remove tmp file
 	lastCall = Date.now();
 	emptyBuffer = false;
@@ -90,6 +93,6 @@ setInterval(async function() {
 		}
 	} else {
 		chord = await detectChord(chromaBuffer);
-		
+		Max.outlet(chord);
 	}
 }, 100)
