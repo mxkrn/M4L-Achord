@@ -1,9 +1,11 @@
-const Max = require("max-api");
+const Max = require('max-api');
+const fsp = require('fs').promises;
+const chokidar = require('chokidar');
 
-var processAudio = require('./src/main').processAudio;
-var detectChord = require('./src/main').detectChord;
-var trimChromaBuffer = require('./src/main').trimChromaBuffer;
-var trimAudioBuffer = require('./src/main').trimAudioBuffer;
+const processAudio = require('./src/main').processAudio;
+const detectChord = require('./src/main').detectChord;
+const trimChromaBuffer = require('./src/main').trimChromaBuffer;
+const readAudioAsync = require('./src/main').readAudioAsync;
 
 /* 
 ---------------------------------------------------------
@@ -11,13 +13,11 @@ This is the entrypoint for the Node script containing the application's
 core logic.
 ---------------------------------------------------------
 */
+// config
 let sampleRate = 22050;
 let sampleLength = 4096;
 let hopLength = sampleLength/2;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
-let eventTracker = 0; // we use this to check if we haven't received new data 
-let chromaBuffer = new Array; // stores the processed chroma arrays
-let audioBuffer = new Array;
 
 // Max handlers and interval functions
 // *disable these to run tests*
@@ -38,28 +38,42 @@ Max.addHandler('setHopLength', (value) => {
 	hopLength = value;
 	Max.post(`Set hop length to ${hopLength}`);
 })
-Max.addHandler('model-type', (value) => {
+Max.addHandler('modelType', (value) => {
 	model = templates[value];
 	console.log('Now using the ', value, ' model type.');
 })
 
-Max.addHandler('processAudio', function(value) {
-	audioBuffer.push(value);	
-});
+// audio processing
+let defaultDirectoryPath;
+let eventTracker = 0;
+let chromaBuffer = new Array;
 
-// Processes and appends chroma to buffer
-setInterval(async function() {
-	if (audioBuffer.length >= sampleLength) {
-		for (let i=0; i < Math.floor(audioBuffer.length / hopLength) - 1; i++) {
-			audio = audioBuffer.slice(i*hopLength, (i*hopLength)+sampleLength);
-			[chromaBuffer, eventTracker] = await processAudio(audio, chromaBuffer, eventTracker);
-		};
-	};
+Max.addHandler('defaultAudioPath', (value) => {
+	defaultDirectoryPath = value;
+	console.log('Default directory path was set to', defaultDirectoryPath);
 })
+
+// This function uses chokidar to watch the default directory where audio is
+// written to from Max. When a new file is added (as identified by the 'rename' method)
+// the file is read, the contents pushed into audioBuffer, and the file is deleted
+const watcher = chokidar.watch(defaultDirectoryPath, {
+	ignored: /(^|[\/\\])\../, // ignore dotfiles
+	persistent: true
+  });
+watcher
+	.on('add', async(fpath) => await onNewFile(fpath))
+	.on('unlink', fpath => Max.post('Removed file', fpath))
+
+async function onNewFile(fpath) {
+	audio = await readAudioAsync(fpath);
+	Max.post('Read audio');
+	[chromaBuffer, eventTracker] = await processAudio(audio, chromaBuffer, eventTracker);
+	Max.post('Processed audio')
+	await fsp.unlink(fpath);
+}
 
 // Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
-	audioBuffer = trimAudioBuffer(audioBuffer);
 	chromaBuffer = trimChromaBuffer(chromaBuffer);
 }, 200);
 

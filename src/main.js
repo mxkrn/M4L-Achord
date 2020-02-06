@@ -1,4 +1,9 @@
+const util = require('util');
+const fsp = require('fs').promises;
+const AudioContext = require('web-audio-api').AudioContext;
+
 const harmonicPCP = require('./hpcp').harmonicPCP;
+
 let sampleRate = 44100;
 let hopLength = 1024;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
@@ -38,15 +43,6 @@ function trimChromaBuffer(buffer) {
 	return buffer;
 }
 exports.trimChromaBuffer = trimChromaBuffer;
-
-function trimAudioBuffer(buffer) {
-	if (buffer.length > Math.floor(bufferLength)) {
-		buffer.reverse().splice(bufferLength);
-		buffer.reverse();
-	};
-	return buffer;
-}
-exports.trimAudioBuffer = trimAudioBuffer;
 
 // const audioBuffer = [];
 // setInterval(featureExtraction, 50);
@@ -91,7 +87,6 @@ async function detectChord(buffer) {
 		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
 		});
-		post('Average chromagram', chromagram);
 
 		// iterate over model async and update distance if less than previous
 		let promises = Object.entries(model).map(async(obj) => {
@@ -103,7 +98,6 @@ async function detectChord(buffer) {
 					'score': distance}
 		 });
 		let scores = await Promise.all(promises)
-		post('Scores:', scores);
 
 		// Get minimum distance and key
 		let max_score = 0;
@@ -131,3 +125,21 @@ exports.dotProduct = dotProduct;
 
 const sumVertical = (r, a) => r.map((b, i) => a[i] + b);
 exports.sumVertical = sumVertical;
+
+// Read, append data to audioBuffer, and pop
+async function readAudioAsync(fpath, buffer) {
+	ctx = new AudioContext();
+	decodeAudioDataAsync = util.promisify(ctx.decodeAudioData);
+	arrayBuffer = await fsp.readFile(fpath);
+	audio = await decodeAudioDataAsync(arrayBuffer)
+		.then((audio) => {
+			return audio._data;
+		})
+		.catch((err) => {
+			// For some reason the err contains the data
+			// An issue has been submitted on web-audio-api
+			return err._data;
+		});
+	return audio[0];
+	}
+exports.readAudioAsync = readAudioAsync;
