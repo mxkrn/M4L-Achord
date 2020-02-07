@@ -18,7 +18,8 @@ TODO: Move feature extraction into worker thread using an audioBuffer
 */
 
 async function processAudio(audio, buffer, event) {
-	if (audio.length === 0) {
+	audioArray = Array.from(audio);
+	if (audioArray.length === 0) {
 		event += 1
 		if (event >= Math.floor(sampleRate/hopLength)*2 & buffer.length > 0) {
 			// After 2 seconds of no data, the chromaBuffer times out and resets
@@ -27,16 +28,17 @@ async function processAudio(audio, buffer, event) {
 		}
 	} else {
 		// On data, process the audio and append to chromaBuffer
-		const hpcp = await harmonicPCP(audio, sampleRate);
+		const hpcp = await harmonicPCP(audioArray, sampleRate);
 		buffer.push(hpcp);
 		event = 0 // Reset event tracker because we received new data
-	};
+	}
 	return [buffer, event];
 }
 exports.processAudio = processAudio;
 
 function trimChromaBuffer(buffer) {
 	if (buffer.length > Math.floor(bufferLength / hopLength)) {
+		console.log('Trimming buffer');
 		buffer.reverse().splice(bufferLength / hopLength);
 		buffer.reverse();
 	};
@@ -81,8 +83,9 @@ const templates = {
 let model = templates['basic']; // defaults to basic model
 
 async function detectChord(buffer) {
-	let chord = 'N';
+	let chord = 'X';
 	if (buffer.length > 0) {
+		console.log('Detecting...')
 		// average all chroma in chromaBuffer
 		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
@@ -105,11 +108,10 @@ async function detectChord(buffer) {
 			if (obj['score'] > max_score) {
 				max_score = obj['score'];
 				chord = obj['chord'];
+				console.log('Detected', chord);
 			};
 		});
-	} else {
-		console.log('No data found in buffer');
-	};
+	}
 	return chord;
 }
 exports.detectChord = detectChord;
