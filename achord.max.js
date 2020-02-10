@@ -3,8 +3,6 @@ const fs = require('fs');
 const fsp = fs.promises;
 const chokidar = require('chokidar');
 
-
-
 const processAudio = require('./src/main').processAudio;
 const detectChord = require('./src/main').detectChord;
 const trimChromaBuffer = require('./src/main').trimChromaBuffer;
@@ -40,18 +38,17 @@ Max.addHandler('setModelType', (value) => {
 	Max.post(`Now using the ${value} model type`);
 })
 Max.addHandler('setDefaultPath', (value) => {
-	if (!fs.existsSync(value + '/tmp/')){
-		fs.mkdirSync(value + '/tmp/');
-	}
-	defaultDirectoryPath = value + '/tmp/';
+	defaultDirectoryPath = value;
 	Max.post(`Set default directory path to ${defaultDirectoryPath}`);
 });
 
 // audio processing
+// vars
 let eventTracker = 0;
 let chromaBuffer = [];
+let currentBufferLength = 0;
 let lastCall = Date.now();
-const timeout = 2000; // timeout (in ms) before chromaBuffer is cleared
+const timeout = 1000; // timeout (in ms) before chromaBuffer is cleared
 let emptyBuffer = true;
 
 // This function uses chokidar to watch the default directory where audio is  written to from Max. 
@@ -60,7 +57,10 @@ let emptyBuffer = true;
 setTimeout(() => {
 	const watcher = chokidar.watch(defaultDirectoryPath, {
 		ignored: /(^|[\/\\])\../, // ignore dotfiles
-		persistent: true
+		persistent: true,
+		usePolling: true,
+		interval: 25,
+		awaitWriteFinish: true
 	  });
 	watcher
 		.on('add', async(fpath) => await onNewFile(fpath))
@@ -71,28 +71,19 @@ async function onNewFile(fpath) {
 	// Process audio
 	audio = await readAudioAsync(fpath);
 	[chromaBuffer, eventTracker] = await processAudio(audio.slice(0, sampleLength), chromaBuffer, eventTracker);
-	Max.post('Appended new chroma', chromaBuffer[0]);
 	// Reset lastCall, emptyBuffer, and remove tmp file
-	lastCall = Date.now();
-	emptyBuffer = false;
 	await fsp.unlink(fpath);
 }
 
 // Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
 	chromaBuffer = trimChromaBuffer(chromaBuffer);
-}, 200);
+}, 100);
 
 // Periodic task to detect chord if data present in buffer
 // If data was present for longer than timeout length, the buffer is cleared
+let chord = 'X';
 setInterval(async function() {
-	if ((Date.now() - lastCall) > timeout) {
-		if (!emptyBuffer) {
-			emptyBuffer = true;
-			chromaBuffer = new Array;
-		}
-	} else {
-		chord = await detectChord(chromaBuffer);
-		Max.outlet(chord);
-	}
-}, 100)
+	chord = await detectChord(chromaBuffer, chord);
+	Max.outlet(chord);
+}, 50);

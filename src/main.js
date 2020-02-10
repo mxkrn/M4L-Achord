@@ -17,6 +17,7 @@ handleAudio: async function to extract chroma from incoming audio
 trimBuffer: interval function to limit number of frames in chromaBuffer to bufferLength
 TODO: Move feature extraction into worker thread using an audioBuffer
 */
+const isBelowThreshold = (currentValue) => currentValue < 0.1;
 
 async function processAudio(audio, buffer, event) {
 	audioArray = Array.from(audio);
@@ -30,17 +31,20 @@ async function processAudio(audio, buffer, event) {
 	} else {
 		// On data, process the audio and append to chromaBuffer
 		const hpcp = await harmonicPCP(audioArray, sampleRate);
-		buffer.push(hpcp);
-		event = 0 // Reset event tracker because we received new data
+		if (hpcp.every(isBelowThreshold)) {
+			event += 1 // invalid data so we increase the eventTracker
+		} else {
+			buffer.push(hpcp);
+			event = 0 // Reset event tracker because we received valid data
+		}
 	}
 	return [buffer, event];
 }
 exports.processAudio = processAudio;
 
 function trimChromaBuffer(buffer) {
-	if (buffer.length > Math.floor(bufferLength / hopLength)) {
-		console.log('Trimming buffer');
-		buffer.reverse().splice(bufferLength / hopLength);
+	if (buffer.length > 10) {
+		buffer.reverse().splice(10);
 		buffer.reverse();
 	};
 	return buffer;
@@ -83,10 +87,8 @@ const templates = {
 
 let model = templates['basic']; // defaults to basic model
 
-async function detectChord(buffer) {
-	let chord = 'X';
+async function detectChord(buffer, chord) {
 	if (buffer.length > 0) {
-		console.log('Detecting...')
 		// average all chroma in chromaBuffer
 		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
@@ -109,7 +111,6 @@ async function detectChord(buffer) {
 			if (obj['score'] > max_score) {
 				max_score = obj['score'];
 				chord = obj['chord'];
-				console.log('Detected', chord);
 			};
 		});
 	}
