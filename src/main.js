@@ -1,4 +1,10 @@
+const Max = require('max-api');
+const util = require('util');
+const fsp = require('fs').promises;
+const AudioContext = require('web-audio-api').AudioContext;
+
 const harmonicPCP = require('./hpcp').harmonicPCP;
+
 let sampleRate = 44100;
 let hopLength = 1024;
 let bufferLength = sampleRate*1; // currently hard-coded to one second
@@ -9,13 +15,13 @@ Audio processing
 ---------------------------------------------------------
 handleAudio: async function to extract chroma from incoming audio
 trimBuffer: interval function to limit number of frames in chromaBuffer to bufferLength
-
 TODO: Move feature extraction into worker thread using an audioBuffer
 */
+const isBelowThreshold = (currentValue) => currentValue < 0.1;
 
-async function handleData(audio, buffer, event) {
-	if (audio.length === 0) {
-		post('Audio snippet passed has length zero');
+async function processAudio(audio, buffer, event) {
+	audioArray = Array.from(audio);
+	if (audioArray.length === 0) {
 		event += 1
 		if (event >= Math.floor(sampleRate/hopLength)*2 & buffer.length > 0) {
 			// After 2 seconds of no data, the chromaBuffer times out and resets
@@ -24,24 +30,26 @@ async function handleData(audio, buffer, event) {
 		}
 	} else {
 		// On data, process the audio and append to chromaBuffer
-		const hpcp = await harmonicPCP(audio, sampleRate);
-		post('Computed HPCP');
-		buffer.push(hpcp);
-		event = 0 // Reset event tracker because we received new data
-	};
+		const hpcp = await harmonicPCP(audioArray, sampleRate);
+		if (hpcp.every(isBelowThreshold)) {
+			event += 1 // invalid data so we increase the eventTracker
+		} else {
+			buffer.push(hpcp);
+			event = 0 // Reset event tracker because we received valid data
+		}
+	}
 	return [buffer, event];
 }
-exports.handleData = handleData;
+exports.processAudio = processAudio;
 
-function trimBuffer(buffer) {
-	if (buffer.length > Math.floor(bufferLength / hopLength)) {
-		buffer.reverse().splice(bufferLength / hopLength);
+function trimChromaBuffer(buffer) {
+	if (buffer.length > 10) {
+		buffer.reverse().splice(10);
 		buffer.reverse();
-		post('Trimmed buffer');
 	};
 	return buffer;
 }
-exports.trimBuffer = trimBuffer;
+exports.trimChromaBuffer = trimChromaBuffer;
 
 // const audioBuffer = [];
 // setInterval(featureExtraction, 50);
@@ -79,14 +87,12 @@ const templates = {
 
 let model = templates['basic']; // defaults to basic model
 
-async function detectChord(buffer) {
-	let chord = 'N';
+async function detectChord(buffer, chord) {
 	if (buffer.length > 0) {
 		// average all chroma in chromaBuffer
 		let chromagram = buffer.reduce(sumVertical).map(i => {
 			return i / buffer.length;
 		});
-		post('Average chromagram', chromagram);
 
 		// iterate over model async and update distance if less than previous
 		let promises = Object.entries(model).map(async(obj) => {
@@ -98,7 +104,6 @@ async function detectChord(buffer) {
 					'score': distance}
 		 });
 		let scores = await Promise.all(promises)
-		post('Scores:', scores);
 
 		// Get minimum distance and key
 		let max_score = 0;
@@ -108,9 +113,7 @@ async function detectChord(buffer) {
 				chord = obj['chord'];
 			};
 		});
-	} else {
-		console.log('No data found in buffer');
-	};
+	}
 	return chord;
 }
 exports.detectChord = detectChord;
@@ -126,3 +129,19 @@ exports.dotProduct = dotProduct;
 
 const sumVertical = (r, a) => r.map((b, i) => a[i] + b);
 exports.sumVertical = sumVertical;
+
+// Read, append data to audioBuffer, and pop
+async function readAudioAsync(fpath, buffer) {
+	ctx = new AudioContext();
+	decodeAudioDataAsync = util.promisify(ctx.decodeAudioData);
+	arrayBuffer = await fsp.readFile(fpath);
+	audio = await decodeAudioDataAsync(arrayBuffer).then((audio) => {
+		return audio._data;
+	}).catch((err) => {
+		// For some reason the err contains the data
+		// An issue has been submitted on web-audio-api
+		return err._data;
+	});
+	return audio[0];
+}
+exports.readAudioAsync = readAudioAsync;

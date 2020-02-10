@@ -30,6 +30,8 @@ let sampleLength = 4096;
 let sampleRate = 44100;
 let signal = Array.from({length: sampleLength}, (v, k) => getRandomInt(256));
 
+
+
 // windowedDFT
 describe('windowedDFT', function() {
   it('should window the signal and then compute the FFT', async function () {
@@ -42,7 +44,7 @@ describe('windowedDFT', function() {
     spectogram = await windowedDFT(signal, sampleRate);
     t1 = performance.now();
     delta = t1 - t0;
-    assert.ok(delta < 50);
+    assert.ok(delta < 20);
   });
 });
 

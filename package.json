@@ -1,30 +1,23 @@
 {
   "name": "m4l-achord",
   "version": "1.0.0",
-  "description": "Live chord detection in using JavaScript in Max 8",
-  "main": "achord.max-bundle.js",
+  "description": "Live chord detection using Node for Max",
+  "main": "n4m.achord.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha",
-    "build": "node_modules/.bin/max-js-bundler build achord.js >> achord.max-bundle.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mxkrn/M4L-Achord.git"
+    "test": "node_modules/.bin/mocha"
   },
   "author": "Max Kraan",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mxkrn/M4L-Achord/issues"
-  },
-  "homepage": "https://github.com/mxkrn/M4L-Achord#readme",
   "devDependencies": {
     "fft-js": "0.0.12",
     "mathjs": "^6.6.0",
-    "max-js-bundler": "^1.2.0",
-    "mocha": "^7.0.1"
+    "mocha": "^7.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "chokidar": "^3.3.1",
+    "web-audio-api": "^0.2.2"
+  }
 }

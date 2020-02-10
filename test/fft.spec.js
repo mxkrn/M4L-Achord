@@ -21,5 +21,5 @@ describe('FFT', function() {
         for (let i=0; i < phasors[0].length; i++) {
             assert.ok(phasors[0][i] === _phasors[0][i]);
         }
-    })
-})
+    });
+});
