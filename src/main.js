@@ -75,19 +75,7 @@ Chord Detection
 ---------------------------------------------------------
 detectChord: interval function to detect chord in chromaBuffer using binary template method
 */
-const _basic = require('../templates/basic.json');
-const _extended = require('../templates/extended.json');
-const _full = require('../templates/full.json');
-
-const templates = {
-	'basic': _basic,
-	'extended': _extended,
-	'full': _full
-}
-
-let model = templates['basic']; // defaults to basic model
-
-async function detectChord(buffer, chord) {
+async function detectChord(buffer, chord, model) {
 	if (buffer.length > 0) {
 		// average all chroma in chromaBuffer
 		let chromagram = buffer.reduce(sumVertical).map(i => {
@@ -114,7 +102,7 @@ async function detectChord(buffer, chord) {
 			};
 		});
 	}
-	return chord;
+	return [chord, model[chord]];
 }
 exports.detectChord = detectChord;
 
