@@ -1,13 +1,9 @@
 const Max = require('max-api');
-const Path = require('path');
 const fs = require('fs');
-const fsp = fs.promises;
-const chokidar = require('chokidar');
 
 const processAudio = require('./src/main').processAudio;
 const detectChord = require('./src/main').detectChord;
 const trimChromaBuffer = require('./src/main').trimChromaBuffer;
-const readAudioAsync = require('./src/main').readAudioAsync;
 
 /* 
 ---------------------------------------------------------
@@ -19,7 +15,6 @@ core logic.
 let sampleRate = 44100;
 let sampleLength = 4096;
 let hopLength = sampleLength/2;
-let bufferLength = sampleRate*1; // currently hard-coded to one second
 let defaultDirectoryPath = '';
 
 Max.addHandler('setSampleRate', (value) => {
@@ -61,42 +56,13 @@ Max.addHandler('setDefaultPath', (path) => {
 	Max.post(`Set default directory path to ${defaultDirectoryPath}`);
 });
 
-// audio processing
-// vars
+// Audio processing
 let eventTracker = 0;
 let chromaBuffer = [];
 
 Max.addHandler('processAudio', async(...audio) => {
 	[chromaBuffer, eventTracker] = await processAudio(audio.slice(0, sampleLength), chromaBuffer, eventTracker);
 })
-// let currentBufferLength = 0;
-// let lastCall = Date.now();
-// const timeout = 1000; // timeout (in ms) before chromaBuffer is cleared
-// let emptyBuffer = true;
-
-// // This function uses chokidar to watch the default directory where audio is  written to from Max. 
-// // When a new file is added:
-// // the file is read, the contents pushed into audioBuffer, and the file is deleted
-// setTimeout(() => {
-// 	const watcher = chokidar.watch(defaultDirectoryPath, {
-// 		ignored: /(^|[\/\\])\../, // ignore dotfiles
-// 		persistent: true,
-// 		usePolling: true,
-// 		interval: 25,
-// 		awaitWriteFinish: true
-// 	  });
-// 	watcher
-// 		.on('add', async(fpath) => await onNewFile(fpath))
-// }, 1000)
-
-
-// async function onNewFile(fpath) {
-// 	// Process audio
-// 	audio = await readAudioAsync(fpath);
-// 	[chromaBuffer, eventTracker] = await processAudio(audio.slice(0, sampleLength), chromaBuffer, eventTracker);
-// 	// Reset lastCall, emptyBuffer, and remove tmp file
-// 	await fsp.unlink(fpath);
-// }
 
 // Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
@@ -136,16 +102,3 @@ async function generateChromaDict(chroma) {
 		chromaDict[key] = value * 100;
 	})
 }
-
-// const deleteFolderRecursive = function(path) {
-// 	if (fs.existsSync(path)) {
-// 	  fs.readdirSync(path).forEach((file, index) => {
-// 		const curPath = Path.join(path, file);
-// 		if (fs.lstatSync(curPath).isDirectory()) { // recurse
-// 		  deleteFolderRecursive(curPath);
-// 		} else { // delete file
-// 		  fs.unlinkSync(curPath);
-// 		}
-// 	  });
-// 	}
-// };

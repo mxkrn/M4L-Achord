@@ -51,24 +51,6 @@ function trimChromaBuffer(buffer) {
 }
 exports.trimChromaBuffer = trimChromaBuffer;
 
-// const audioBuffer = [];
-// setInterval(featureExtraction, 50);
-//
-// async function featureExtraction() {
-// 	if (audioBuffer.length > bufferLength) {
-// 		// Trim audio buffer to buffer length if necessary
-// 		audioBuffer.reverse().splice(bufferLength);
-// 		audioBuffer.reverse();
-// 	}
-// 	if (audioBuffer.length > sampleLength) {
-// 		for (let i = (audioBuffer.length / hopLength) - 1; i > 0; i--) {
-// 			startIndex = i*hopLength - hopLength;
-// 			hpcp = await harmonicPCP(audioBuffer[startIndex, sampleLength], sampleRate);
-// 			chromagram.push(hpcp);
-// 			chromaCount += 1;
-// 		}
-// 	}
-// }
 /* 
 ---------------------------------------------------------
 Chord Detection
@@ -117,19 +99,3 @@ exports.dotProduct = dotProduct;
 
 const sumVertical = (r, a) => r.map((b, i) => a[i] + b);
 exports.sumVertical = sumVertical;
-
-// Read, append data to audioBuffer, and pop
-async function readAudioAsync(fpath, buffer) {
-	ctx = new AudioContext();
-	decodeAudioDataAsync = util.promisify(ctx.decodeAudioData);
-	arrayBuffer = await fsp.readFile(fpath);
-	audio = await decodeAudioDataAsync(arrayBuffer).then((audio) => {
-		return audio._data;
-	}).catch((err) => {
-		// For some reason the err contains the data
-		// An issue has been submitted on web-audio-api
-		return err._data;
-	});
-	return audio[0];
-}
-exports.readAudioAsync = readAudioAsync;
