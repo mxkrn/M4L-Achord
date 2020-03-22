@@ -61,13 +61,13 @@ let eventTracker = 0;
 let chromaBuffer = [];
 
 Max.addHandler('processAudio', async(...audio) => {
-	[chromaBuffer, eventTracker] = await processAudio(audio.slice(0, sampleLength), chromaBuffer, eventTracker);
+	[chromaBuffer, eventTracker] = await processAudio(audio, chromaBuffer, eventTracker);
 })
 
 // Periodic task to trim buffer if length is greater than bufferLength
 setInterval(function() {
 	chromaBuffer = trimChromaBuffer(chromaBuffer);
-}, 100);
+}, 200);
 
 // Periodic task to detect chord if data present in buffer
 // If data was present for longer than timeout length, the buffer is cleared
@@ -89,9 +89,9 @@ setInterval(async function() {
 	}
 	Max.setDict('chromaDict', chromaDict);
 	Max.outlet(chord);
-}, 100);
+}, 200);
 
-async function generateChromaDict(chroma) {
+function generateChromaDict(chroma) {
 	chroma.forEach((value, index) => {
 		let key = index;
 		if (index <  3) {

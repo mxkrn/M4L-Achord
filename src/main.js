@@ -43,8 +43,8 @@ async function processAudio(audio, buffer, event) {
 exports.processAudio = processAudio;
 
 function trimChromaBuffer(buffer) {
-	if (buffer.length > 10) {
-		buffer.reverse().splice(10);
+	if (buffer.length > 5) {
+		buffer.reverse().splice(5);
 		buffer.reverse();
 	};
 	return buffer;
@@ -69,7 +69,7 @@ async function detectChord(buffer, chord, model) {
 			const key = obj[0];
 			const target = obj[1];
 
-			let distance = await dotProduct(chromagram, target);
+			let distance = dotProduct(chromagram, target);
 			return {'chord': key, 
 					'score': distance}
 		 });
@@ -88,11 +88,10 @@ async function detectChord(buffer, chord, model) {
 }
 exports.detectChord = detectChord;
 
-async function dotProduct(data, target) {
-    let promises = data.map(async(bin, i) => {
-        return await bin*target[i];
+function dotProduct(data, target) {
+    let scores = data.map(async(bin, i) => {
+        return bin*target[i];
     });
-	let scores = await Promise.all(promises);
 	return scores.reduce((a, b) => a + b, 0)
 }
 exports.dotProduct = dotProduct;
