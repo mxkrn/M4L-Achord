@@ -107,4 +107,4 @@ dist
 .vscode-test
 
 data/
-builds/achord_1.*.amxd
+builds/*
