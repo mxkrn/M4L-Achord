@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 41.0, 84.0, 1061.0, 699.0 ],
+		"rect" : [ 34.0, 77.0, 1157.0, 713.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -101,14 +101,14 @@
 					"patching_rect" : [ 10.0, 217.0, 53.0, 39.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_mmax" : 6.0,
-							"parameter_initial" : [ -70 ],
-							"parameter_shortname" : "live.gain~",
 							"parameter_type" : 0,
 							"parameter_unitstyle" : 4,
 							"parameter_mmin" : -70.0,
 							"parameter_longname" : "live.gain~",
-							"parameter_initial_enable" : 1
+							"parameter_initial_enable" : 1,
+							"parameter_mmax" : 6.0,
+							"parameter_initial" : [ -70 ],
+							"parameter_shortname" : "live.gain~"
 						}
 
 					}
@@ -206,12 +206,12 @@
 					"presentation_rect" : [ 100.375, 67.0, 65.375, 49.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_mmax" : 2,
-							"parameter_shortname" : "live.tab",
 							"parameter_enum" : [ "majmin", "majmin7", "all" ],
 							"parameter_type" : 2,
 							"parameter_unitstyle" : 0,
-							"parameter_longname" : "live.tab"
+							"parameter_longname" : "live.tab",
+							"parameter_mmax" : 2,
+							"parameter_shortname" : "live.tab"
 						}
 
 					}
@@ -639,7 +639,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 572.0, 51.0, 109.0, 126.0 ],
+					"patching_rect" : [ 572.0, 51.0, 111.0, 126.0 ],
 					"text" : "config sets various configuration values like sample length and hop length (for the STFT) and the defaultDirectoryPath, which is where the audio chunks are written to from memory."
 				}
 
@@ -657,11 +657,11 @@
 					"presentation_rect" : [ 8.5, 143.333333373069763, 13.5, 14.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.button[1]",
 							"parameter_enum" : [ "off", "on" ],
 							"parameter_type" : 2,
-							"parameter_longname" : "live.button[3]"
+							"parameter_longname" : "live.button[3]",
+							"parameter_mmax" : 1,
+							"parameter_shortname" : "live.button[1]"
 						}
 
 					}
@@ -756,11 +756,11 @@
 					"rounded" : 779.0,
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.toggle",
 							"parameter_enum" : [ "off", "on" ],
 							"parameter_type" : 2,
-							"parameter_longname" : "live.toggle"
+							"parameter_longname" : "live.toggle",
+							"parameter_mmax" : 1,
+							"parameter_shortname" : "live.toggle"
 						}
 
 					}
@@ -798,11 +798,11 @@
 					"presentation_rect" : [ 58.0, 143.333333373069763, 13.5, 14.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.button[1]",
 							"parameter_enum" : [ "off", "on" ],
 							"parameter_type" : 2,
-							"parameter_longname" : "live.button[1]"
+							"parameter_longname" : "live.button[1]",
+							"parameter_mmax" : 1,
+							"parameter_shortname" : "live.button[1]"
 						}
 
 					}
@@ -2234,7 +2234,7 @@
 					"patching_rect" : [ 459.5, 366.5, 129.0, 45.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 8.5, 8.0, 158.0, 45.0 ],
-					"text" : "F#:min",
+					"text" : "A:maj",
 					"textcolor" : [ 0.996078431372549, 0.996078431372549, 0.996078431372549, 1.0 ],
 					"textjustification" : 1
 				}
@@ -2252,8 +2252,6 @@
 					"saved_object_attributes" : 					{
 						"autostart" : 1,
 						"defer" : 0,
-						"node_bin_path" : "",
-						"npm_bin_path" : "",
 						"watch" : 0
 					}
 ,
@@ -2522,8 +2520,25 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-1", 1 ],
+					"order" : 0,
+					"source" : [ "obj-3", 1 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-1", 0 ],
+					"order" : 0,
+					"source" : [ "obj-3", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-31", 1 ],
 					"midpoints" : [ 53.5, 209.5, 53.5, 209.5 ],
+					"order" : 1,
 					"source" : [ "obj-3", 1 ]
 				}
 
@@ -2532,6 +2547,7 @@
 				"patchline" : 				{
 					"destination" : [ "obj-31", 0 ],
 					"midpoints" : [ 19.5, 209.5, 19.5, 209.5 ],
+					"order" : 1,
 					"source" : [ "obj-3", 0 ]
 				}
 
