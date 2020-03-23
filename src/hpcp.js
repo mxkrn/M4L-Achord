@@ -14,27 +14,25 @@ const length = 0.5*(4/3);
 // Calculates the HPCP according to Gomez (2006)
 async function harmonicPCP(signal, samplerate) {
     let chromagram = Array.from({length: 12}, (v, k) => []);
-    let freqPeaks = await peakDetection(signal, samplerate);
-    let signalPromises = freqPeaks.map(async(peak) => {
-        temperedScale.map((f_bin, i) => {
+    let freqPeaks = peakDetection(signal, samplerate);
+    freqPeaks.forEach((peak) => {
+        temperedScale.forEach((f_bin, i) => {
             let d = 12*Math.log2(peak['f'] / f_bin);
             if (Math.abs(d) <= length) {
                 let weight = Math.cos((Math.PI/2)*(d/length));
                 chromagram[i%12].push(weight*(peak['y']**2));
             };
         });
-        return;
     });
-    await Promise.all(signalPromises);
     return chromagram.map((bin) => {
         return bin.reduce((a, b) => a + b, 0);
     });
 }
 exports.harmonicPCP = harmonicPCP;
 
-async function peakDetection(signal, samplerate) {
+function peakDetection(signal, samplerate) {
     let spectogram = windowedDFT(signal, samplerate);
-    let data = spectogram['freqs'].map(async(f, i) => {
+    let data = spectogram['freqs'].map((f, i) => {
         if (spectogram['y'][i-1] < spectogram['y'][i] && spectogram['y'][i] > spectogram['y'][i+1]) {
             let peak = parabolaPeakInterpolation(f, spectogram['y'], i);
             return peak;
@@ -46,7 +44,7 @@ async function peakDetection(signal, samplerate) {
 }
 exports.peakDetection = peakDetection;
 
-async function parabolaPeakInterpolation(freq, y, idx) {
+function parabolaPeakInterpolation(freq, y, idx) {
     let peak = getParabolaPeak(y[idx-1], y[idx], y[idx+1], freq);
     if (peak['f'] > fmin & peak['f'] < fmax) {
         if (peak['y'] > 0.1) {
@@ -64,7 +62,7 @@ function getParabolaPeak(a, b, c, f) {
 }
 exports.getParabolaPeak = getParabolaPeak;
 
-async function windowedDFT(signal, samplerate) {
+function windowedDFT(signal, samplerate) {
     let windowed = signal.map((y, i) => {
         const value = y*(0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (signal.length - 1)));
         return value;

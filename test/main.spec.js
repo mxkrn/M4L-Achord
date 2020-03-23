@@ -5,9 +5,7 @@ const math = require('mathjs');
 const sumVertical = require('../src/main').sumVertical;
 const detectChord = require('../src/main').detectChord;
 const trimBuffer = require('../src/main').trimChromaBuffer;
-const handleAudio = require('../src/main').processAudio;
-const readAudio = require('../src/main').readAudioAsync;
-
+const processAudio = require('../src/main').processAudio;
 
 testArray = [[2,3,1],[6,1,5]];
 
@@ -76,30 +74,30 @@ chromaBuffer = [];
 describe('handleAudio', function() {
     it('should increase the eventTracker when an empty audio event comesin', async function() {
         emptySignal = [];
-        [chromaBuffer, eventTracker] = await handleAudio(emptySignal, chromaBuffer, eventTracker);
+        [chromaBuffer, eventTracker] = await processAudio(emptySignal, chromaBuffer, eventTracker);
         assert.ok(eventTracker === 1);
         assert.ok(chromaBuffer.length === 0);
     });
     it('should extract chroma from incoming audio and append to chroma buffer', async function() {
         eventTracker = 0;
-        [chromaBuffer, eventTracker] = await handleAudio(signal, chromaBuffer, eventTracker);
+        [chromaBuffer, eventTracker] = await processAudio(signal, chromaBuffer, eventTracker);
         assert.ok(eventTracker === 0);
         assert.ok(chromaBuffer.length === 1);
         assert.ok(chromaBuffer[0].length === 12);
     });
     it('should clear the buffer if we received 2 seconds of empty audio chunks', async function() {
         eventTracker = 0;
-        await handleAudio(signal, chromaBuffer, eventTracker);
+        await processAudio(signal, chromaBuffer, eventTracker);
         assert.ok(chromaBuffer.length === 2);
         for (let i=0; i < Math.floor(sampleRate/hopLength)*2 + 1; i++) {
-            [chromaBuffer, eventTracker] = await handleAudio(emptySignal, chromaBuffer, eventTracker);
+            [chromaBuffer, eventTracker] = await processAudio(emptySignal, chromaBuffer, eventTracker);
             assert.ok(eventTracker == i + 1);
         };
         assert.ok(chromaBuffer.length === 0);
     });
     it ('should be quick', async function() {
         t0 = performance.now();
-        await handleAudio(signal, chromaBuffer, eventTracker);
+        await processAudio(signal, chromaBuffer, eventTracker);
         t1 = performance.now();
         delta = t1 - t0;
         console.log(`handleAudio takes ${delta} milliseconds`);
@@ -108,10 +106,10 @@ describe('handleAudio', function() {
 
 // detectChord
 describe('detectChord', function() {
-    it('should be an A:min chord, hurrah it works!', async function() {
+    it('should be an A:min chord', async function() {
         eventTracker = 0;
         chromaBuffer = [];
-        [chromaBuffer, eventTracker] = await handleAudio(signal, chromaBuffer, eventTracker);
+        [chromaBuffer, eventTracker] = await processAudio(signal, chromaBuffer, eventTracker);
         chord = await detectChord(chromaBuffer);
         assert.ok(chord == 'A:min');
     });
@@ -127,21 +125,21 @@ describe('detectChord', function() {
 let audioBuffer = [];
 
 // readAudio
-describe('readAudio', function() {
-    it('should read the audio file and append to audioBuffer', async function() {
-        let fname = './data/piano3.wav';
-        assert.ok(audioBuffer.length === 0);
-        audio = await readAudio(fname);
-        console.log('Function call done');
-        assert.ok(typeof audio !== 'undefined');
-        assert.ok(audio.length === 280994);
-    })
-    it('should be fast', async function() {
-        let fname = './data/piano3.wav';
-        t0 = performance.now();
-        audio = await readAudio(fname);
-        t1 = performance.now();
-        delta = t1 - t0;
-        console.log(`detectChord takes ${delta} milliseconds`);
-    })
-})
+// describe('readAudio', function() {
+//     it('should read the audio file and append to audioBuffer', async function() {
+//         let fname = './data/piano3.wav';
+//         assert.ok(audioBuffer.length === 0);
+//         audio = await readAudio(fname);
+//         console.log('Function call done');
+//         assert.ok(typeof audio !== 'undefined');
+//         assert.ok(audio.length === 280994);
+//     })
+//     it('should be fast', async function() {
+//         let fname = './data/piano3.wav';
+//         t0 = performance.now();
+//         audio = await readAudio(fname);
+//         t1 = performance.now();
+//         delta = t1 - t0;
+//         console.log(`detectChord takes ${delta} milliseconds`);
+//     })
+// })
