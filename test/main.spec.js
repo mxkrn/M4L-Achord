@@ -102,20 +102,35 @@ describe('handleAudio', function() {
         delta = t1 - t0;
         console.log(`handleAudio takes ${delta} milliseconds`);
     });
-})
+});
+
+const _basic = require('../templates/basic.json');
+const _extended = require('../templates/extended.json');
+const _full = require('../templates/full.json');
+
+const templates = {
+    'majmin': _basic,
+    'majmin7': _extended,
+    'all': _full
+}
+
+let model = templates['majmin']; // defaults to basic model
 
 // detectChord
 describe('detectChord', function() {
     it('should be an A:min chord', async function() {
-        eventTracker = 0;
-        chromaBuffer = [];
+        let eventTracker = 0;
+        let chromaBuffer = [];
+        let chord = 'X';
+
         [chromaBuffer, eventTracker] = await processAudio(signal, chromaBuffer, eventTracker);
-        chord = await detectChord(chromaBuffer);
+        [chord, chroma] = await detectChord(chromaBuffer, chord, model);
         assert.ok(chord == 'A:min');
     });
     it('should also be quick', async function() {
+        let chord = 'X';
         t0 = performance.now();
-        chord = await detectChord(chromaBuffer);
+        [chord, chroma] = await detectChord(chromaBuffer, chord, model);
         t1 = performance.now();
         delta = t1 - t0;
         console.log(`detectChord takes ${delta} milliseconds`);

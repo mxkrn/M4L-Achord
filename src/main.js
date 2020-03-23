@@ -1,13 +1,7 @@
-// const Max = require('max-api');
-// const util = require('util');
-// const fsp = require('fs').promises;
-// const AudioContext = require('web-audio-api').AudioContext;
-
 const harmonicPCP = require('./hpcp').harmonicPCP;
 
 let sampleRate = 44100;
 let hopLength = 1024;
-// let bufferLength = sampleRate*1; // currently hard-coded to one second
 
 /*
 ---------------------------------------------------------
@@ -15,7 +9,6 @@ Audio processing
 ---------------------------------------------------------
 handleAudio: async function to extract chroma from incoming audio
 trimBuffer: interval function to limit number of frames in chromaBuffer to bufferLength
-TODO: Move feature extraction into worker thread using an audioBuffer
 */
 const isBelowThreshold = (currentValue) => currentValue < 0.1;
 
@@ -69,7 +62,7 @@ async function detectChord(buffer, chord, model) {
 			const key = obj[0];
 			const target = obj[1];
 
-			let distance = await dotProduct(chromagram, target);
+			let distance = dotProduct(chromagram, target);
 			return {'chord': key, 
 					'score': distance}
 		 });
@@ -88,11 +81,11 @@ async function detectChord(buffer, chord, model) {
 }
 exports.detectChord = detectChord;
 
-async function dotProduct(data, target) {
-    let promises = data.map(async(bin, i) => {
-        return await bin*target[i];
+function dotProduct(data, target) {
+    let scores = data.map((bin, i) => {
+        return bin*target[i];
     });
-	let scores = await Promise.all(promises);
+	// let scores = await Promise.all(promises);
 	return scores.reduce((a, b) => a + b, 0)
 }
 exports.dotProduct = dotProduct;
