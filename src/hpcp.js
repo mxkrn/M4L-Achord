@@ -14,43 +14,38 @@ const length = 0.5*(4/3);
 // Calculates the HPCP according to Gomez (2006)
 async function harmonicPCP(signal, samplerate) {
     let chromagram = Array.from({length: 12}, (v, k) => []);
-    let freqPeaks = await peakDetection(signal, samplerate);
-    let signalPromises = freqPeaks.map(async(peak) => {
-        let distancePromises = temperedScale.map(async(f_bin, i) => {
+    let freqPeaks = peakDetection(signal, samplerate);
+    freqPeaks.forEach((peak) => {
+        temperedScale.forEach((f_bin, i) => {
             let d = 12*Math.log2(peak['f'] / f_bin);
             if (Math.abs(d) <= length) {
                 let weight = Math.cos((Math.PI/2)*(d/length));
                 chromagram[i%12].push(weight*(peak['y']**2));
             };
         });
-        await Promise.all(distancePromises);
-        return;
     });
-    await Promise.all(signalPromises);
-    let promises = chromagram.map(async(bin) => {
+    return chromagram.map((bin) => {
         return bin.reduce((a, b) => a + b, 0);
-    })
-    return await Promise.all(promises);
+    });
 }
 exports.harmonicPCP = harmonicPCP;
 
-async function peakDetection(signal, samplerate) {
-    let spectogram = await windowedDFT(signal, samplerate);
-    let promises = spectogram['freqs'].map(async(f, i) => {
+function peakDetection(signal, samplerate) {
+    let spectogram = windowedDFT(signal, samplerate);
+    let data = spectogram['freqs'].map((f, i) => {
         if (spectogram['y'][i-1] < spectogram['y'][i] && spectogram['y'][i] > spectogram['y'][i+1]) {
-            let peak = await parabolaPeakInterpolation(f, spectogram['y'], i);
+            let peak = parabolaPeakInterpolation(f, spectogram['y'], i);
             return peak;
         };
     });
-    let data = await Promise.all(promises);
     return data.filter(p => {
         return p !== undefined
     })
 }
 exports.peakDetection = peakDetection;
 
-async function parabolaPeakInterpolation(freq, y, idx) {
-    let peak = await getParabolaPeak(y[idx-1], y[idx], y[idx+1], freq);
+function parabolaPeakInterpolation(freq, y, idx) {
+    let peak = getParabolaPeak(y[idx-1], y[idx], y[idx+1], freq);
     if (peak['f'] > fmin & peak['f'] < fmax) {
         if (peak['y'] > 0.1) {
             return peak;
@@ -59,7 +54,7 @@ async function parabolaPeakInterpolation(freq, y, idx) {
 }
 exports.parabolaPeakInterpolation = parabolaPeakInterpolation;
 
-async function getParabolaPeak(a, b, c, f) {
+function getParabolaPeak(a, b, c, f) {
     let p = ((a - c) / (a - 2*b + c)) / 2;
     let f_hat = f + p;
     let y = b - ((a - c) * (p / 4));
@@ -67,12 +62,11 @@ async function getParabolaPeak(a, b, c, f) {
 }
 exports.getParabolaPeak = getParabolaPeak;
 
-async function windowedDFT(signal, samplerate) {
-    let promises = signal.map(async(y, i) => {
-        const value = await y*(0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (signal.length - 1)));
+function windowedDFT(signal, samplerate) {
+    let windowed = signal.map((y, i) => {
+        const value = y*(0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (signal.length - 1)));
         return value;
     });
-    let windowed = await Promise.all(promises);
     const phasors = fft(windowed);
 	const freqs = fftFreq(phasors, samplerate);
     const magnitudes = fftMag(phasors);
