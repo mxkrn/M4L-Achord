@@ -87,9 +87,9 @@ setInterval(async function() {
 			42: 0, 43: 0, 44: 0, 45: 0, 46: 0, 47: 0
 		}
 	}
-	Max.setDict('chromaDict', chromaDict);
 	Max.outlet(chord);
-}, 200);
+	await Max.setDict('chromaDict', chromaDict);
+}, 400);
 
 function generateChromaDict(chroma) {
 	chroma.forEach((value, index) => {
