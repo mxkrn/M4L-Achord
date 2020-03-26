@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 34.0, 77.0, 1157.0, 713.0 ],
+		"rect" : [ 41.0, 84.0, 1160.0, 713.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -167,7 +167,7 @@
 						"followglobaltempo" : 0,
 						"formantcorrection" : 0,
 						"mode" : "basic",
-						"originallength" : [ 3840.0, "ticks" ],
+						"originallength" : [ 11520.0, "ticks" ],
 						"originaltempo" : 120.0,
 						"pitchcorrection" : 0,
 						"quality" : "basic",
@@ -639,7 +639,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 572.0, 51.0, 111.0, 126.0 ],
+					"patching_rect" : [ 572.0, 51.0, 112.0, 126.0 ],
 					"text" : "config sets various configuration values like sample length and hop length (for the STFT) and the defaultDirectoryPath, which is where the audio chunks are written to from memory."
 				}
 
@@ -2234,7 +2234,7 @@
 					"patching_rect" : [ 459.5, 366.5, 129.0, 45.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 8.5, 8.0, 158.0, 45.0 ],
-					"text" : "A:maj",
+					"text" : "C:maj",
 					"textcolor" : [ 0.996078431372549, 0.996078431372549, 0.996078431372549, 1.0 ],
 					"textjustification" : 1
 				}
@@ -2252,6 +2252,8 @@
 					"saved_object_attributes" : 					{
 						"autostart" : 1,
 						"defer" : 0,
+						"node_bin_path" : "",
+						"npm_bin_path" : "",
 						"watch" : 0
 					}
 ,
@@ -2520,25 +2522,8 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-1", 1 ],
-					"order" : 0,
-					"source" : [ "obj-3", 1 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-1", 0 ],
-					"order" : 0,
-					"source" : [ "obj-3", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
 					"destination" : [ "obj-31", 1 ],
 					"midpoints" : [ 53.5, 209.5, 53.5, 209.5 ],
-					"order" : 1,
 					"source" : [ "obj-3", 1 ]
 				}
 
@@ -2547,7 +2532,6 @@
 				"patchline" : 				{
 					"destination" : [ "obj-31", 0 ],
 					"midpoints" : [ 19.5, 209.5, 19.5, 209.5 ],
-					"order" : 1,
 					"source" : [ "obj-3", 0 ]
 				}
 
@@ -2734,11 +2718,11 @@
 			}
  ],
 		"parameters" : 		{
-			"obj-24" : [ "live.button[3]", "live.button[1]", 0 ],
-			"obj-10" : [ "live.button[1]", "live.button[1]", 0 ],
 			"obj-4" : [ "live.tab", "live.tab", 0 ],
 			"obj-31" : [ "live.gain~", "live.gain~", 0 ],
 			"obj-15" : [ "live.toggle", "live.toggle", 0 ],
+			"obj-24" : [ "live.button[3]", "live.button[1]", 0 ],
+			"obj-10" : [ "live.button[1]", "live.button[1]", 0 ],
 			"parameterbanks" : 			{
 
 			}
