@@ -17,17 +17,17 @@ let sampleLength = 4096;
 let hopLength = sampleLength/2;
 let defaultDirectoryPath = '';
 
-Max.addHandler('setSampleRate', (value) => {
+Max.addHandler('setSampleRate', async(value) => {
 	sampleRate = value;
-	Max.post(`Set sample rate to ${sampleRate}`);
+	await Max.post(`Set sample rate to ${sampleRate}`);
 })
-Max.addHandler('setSampleLength', (value) => {
+Max.addHandler('setSampleLength', async(value) => {
 	sampleLength = value;
-	Max.post(`Set sample length to ${sampleLength}`);
+	await Max.post(`Set sample length to ${sampleLength}`);
 })
-Max.addHandler('setHopLength', (value) => {
+Max.addHandler('setHopLength', async(value) => {
 	hopLength = value;
-	Max.post(`Set hop length to ${hopLength}`);
+	await Max.post(`Set hop length to ${hopLength}`);
 })
 
 const _basic = require('./templates/basic.json');
@@ -42,18 +42,18 @@ const templates = {
 
 let model = templates['majmin']; // defaults to basic model
 
-Max.addHandler('setModelType', (value) => {
+Max.addHandler('setModelType', async(value) => {
 	model = templates[value];
-	Max.post(`Now using the ${value} model type`);
+	await Max.post(`Now using the ${value} model type`);
 })
-Max.addHandler('setDefaultPath', (path) => {
+Max.addHandler('setDefaultPath', async(path) => {
 	if (fs.existsSync(path)) {
 		deleteFolderRecursive(path);
 	} else {
 		fs.mkdirSync(path);
 	};
 	defaultDirectoryPath = path;
-	Max.post(`Set default directory path to ${defaultDirectoryPath}`);
+	await Max.post(`Set default directory path to ${defaultDirectoryPath}`);
 });
 
 // Audio processing
@@ -72,26 +72,21 @@ setInterval(function() {
 // Periodic task to detect chord if data present in buffer
 // If data was present for longer than timeout length, the buffer is cleared
 let chord = 'X';
-let chromaDict = {
-	36: 0, 37: 0, 38: 0, 39: 0, 40: 0, 41: 0,
-	42: 0, 43: 0, 44: 0, 45: 0, 46: 0, 47: 0
-};
+// let chromaDict = {
+// 	36: 0, 37: 0, 38: 0, 39: 0, 40: 0, 41: 0,
+// 	42: 0, 43: 0, 44: 0, 45: 0, 46: 0, 47: 0
+// };
 
 setInterval(async function() {
 	[chord, chroma] = await detectChord(chromaBuffer, chord, model);
 	if (typeof chroma !== 'undefined') {
-		generateChromaDict(chroma);
-	} else {
-		chromaDict = {
-			36: 0, 37: 0, 38: 0, 39: 0, 40: 0, 41: 0,
-			42: 0, 43: 0, 44: 0, 45: 0, 46: 0, 47: 0
-		}
+		await generateChromaDict(chroma);
 	}
-	Max.outlet(chord);
-	await Max.setDict('chromaDict', chromaDict);
+	await Max.outlet(chord);
 }, 400);
 
-function generateChromaDict(chroma) {
+async function generateChromaDict(chroma) {
+	let chromaDict = {};
 	chroma.forEach((value, index) => {
 		let key = index;
 		if (index <  3) {
@@ -101,4 +96,5 @@ function generateChromaDict(chroma) {
 		}
 		chromaDict[key] = value * 100;
 	})
+	await Max.setDict('chromaDict', chromaDict);
 }
