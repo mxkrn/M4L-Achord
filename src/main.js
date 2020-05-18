@@ -13,7 +13,7 @@ trimBuffer: interval function to limit number of frames in chromaBuffer to buffe
 const isBelowThreshold = (currentValue) => currentValue < 0.1;
 
 async function processAudio(audio, buffer, event) {
-	audioArray = Array.from(audio);
+	const audioArray = Array.from(audio);
 	if (audioArray.length === 0) {
 		event += 1
 		if (event >= Math.floor(sampleRate/hopLength)*2 & buffer.length > 0) {
