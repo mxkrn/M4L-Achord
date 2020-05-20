@@ -101,14 +101,14 @@
 					"patching_rect" : [ 10.0, 217.0, 53.0, 39.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
+							"parameter_type" : 0,
+							"parameter_unitstyle" : 4,
+							"parameter_mmin" : -70.0,
 							"parameter_longname" : "live.gain~",
 							"parameter_initial_enable" : 1,
 							"parameter_mmax" : 6.0,
 							"parameter_initial" : [ -70 ],
-							"parameter_shortname" : "live.gain~",
-							"parameter_type" : 0,
-							"parameter_unitstyle" : 4,
-							"parameter_mmin" : -70.0
+							"parameter_shortname" : "live.gain~"
 						}
 
 					}
@@ -206,12 +206,12 @@
 					"presentation_rect" : [ 100.375, 67.0, 65.375, 49.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
-							"parameter_longname" : "live.tab",
-							"parameter_mmax" : 2,
-							"parameter_shortname" : "live.tab",
 							"parameter_enum" : [ "majmin", "majmin7", "all" ],
 							"parameter_type" : 2,
-							"parameter_unitstyle" : 0
+							"parameter_unitstyle" : 0,
+							"parameter_longname" : "live.tab",
+							"parameter_mmax" : 2,
+							"parameter_shortname" : "live.tab"
 						}
 
 					}
@@ -657,11 +657,11 @@
 					"presentation_rect" : [ 8.5, 143.333333373069763, 13.5, 14.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
+							"parameter_enum" : [ "off", "on" ],
+							"parameter_type" : 2,
 							"parameter_longname" : "live.button[3]",
 							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.button[1]",
-							"parameter_enum" : [ "off", "on" ],
-							"parameter_type" : 2
+							"parameter_shortname" : "live.button[1]"
 						}
 
 					}
@@ -756,11 +756,11 @@
 					"rounded" : 779.0,
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
+							"parameter_enum" : [ "off", "on" ],
+							"parameter_type" : 2,
 							"parameter_longname" : "live.toggle",
 							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.toggle",
-							"parameter_enum" : [ "off", "on" ],
-							"parameter_type" : 2
+							"parameter_shortname" : "live.toggle"
 						}
 
 					}
@@ -798,11 +798,11 @@
 					"presentation_rect" : [ 58.0, 143.333333373069763, 13.5, 14.0 ],
 					"saved_attribute_attributes" : 					{
 						"valueof" : 						{
+							"parameter_enum" : [ "off", "on" ],
+							"parameter_type" : 2,
 							"parameter_longname" : "live.button[1]",
 							"parameter_mmax" : 1,
-							"parameter_shortname" : "live.button[1]",
-							"parameter_enum" : [ "off", "on" ],
-							"parameter_type" : 2
+							"parameter_shortname" : "live.button[1]"
 						}
 
 					}
@@ -2234,7 +2234,7 @@
 					"patching_rect" : [ 459.5, 366.5, 129.0, 45.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 8.5, 8.0, 158.0, 45.0 ],
-					"text" : "C:maj",
+					"text" : "C:min",
 					"textcolor" : [ 0.996078431372549, 0.996078431372549, 0.996078431372549, 1.0 ],
 					"textjustification" : 1
 				}
@@ -2252,6 +2252,8 @@
 					"saved_object_attributes" : 					{
 						"autostart" : 1,
 						"defer" : 0,
+						"node_bin_path" : "",
+						"npm_bin_path" : "",
 						"watch" : 0
 					}
 ,
@@ -2716,11 +2718,11 @@
 			}
  ],
 		"parameters" : 		{
-			"obj-10" : [ "live.button[1]", "live.button[1]", 0 ],
 			"obj-4" : [ "live.tab", "live.tab", 0 ],
 			"obj-31" : [ "live.gain~", "live.gain~", 0 ],
 			"obj-24" : [ "live.button[3]", "live.button[1]", 0 ],
 			"obj-15" : [ "live.toggle", "live.toggle", 0 ],
+			"obj-10" : [ "live.button[1]", "live.button[1]", 0 ],
 			"parameterbanks" : 			{
 
 			}
