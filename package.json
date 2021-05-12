@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "fft-js": "0.0.12",
-    "mathjs": "^6.6.0",
+    "mathjs": "^7.5.1",
     "mocha": "^7.0.0"
   },
   "dependencies": {
